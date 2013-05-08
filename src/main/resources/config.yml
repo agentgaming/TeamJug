@@ -1,0 +1,4 @@
+cloud:
+  host: http://www.mike724.com
+  path: /gaming/
+  key:  keyGoesHere

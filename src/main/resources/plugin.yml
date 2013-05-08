@@ -1,0 +1,11 @@
+name: TeamJug
+version: 0.1
+author: Mike724
+main: com.mike724.teamjug.TeamJug
+commands:
+  jug:
+    description: Main command
+  ban:
+    description: Ban command
+  unban:
+    description: Unban command
