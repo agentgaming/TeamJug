@@ -4,6 +4,7 @@ import com.mike724.networkapi.DataStorage;
 import com.mike724.networkapi.NetworkPlayer;
 import com.mike724.networkapi.NetworkRank;
 import org.bukkit.*;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -80,7 +81,20 @@ public class JListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onHungerChange(FoodLevelChangeEvent event) {
-        event.setFoodLevel(20);
+        HumanEntity ent = event.getEntity();
+        if(!(ent instanceof Player)) {
+            return;
+        }
+        JPlayer jp = TeamJug.getInstance().getGame().getPlayer(ent.getName());
+        if(jp == null) {
+            event.setFoodLevel(20);
+            return;
+        }
+        if(jp.isJuggernaut()) {
+            event.setFoodLevel(6);
+        } else {
+            event.setFoodLevel(20);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
