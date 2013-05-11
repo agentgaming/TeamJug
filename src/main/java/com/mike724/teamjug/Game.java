@@ -269,20 +269,6 @@ public class Game implements Runnable {
 
             p.setFoodLevel(6);
         }
-
-        try {
-
-        Field maxHealth = p.getClass()/*.getSuperclass()*/.getDeclaredField("maxHealth");
-        maxHealth.setAccessible(true);
-        maxHealth.setInt(p, 200);
-
-        Field health = p.getClass()/*.getSuperclass()*/.getDeclaredField("health");
-        health.setAccessible(true);
-        health.setInt(p, 200);
-
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void updateAllScoreboards(int secs) {
