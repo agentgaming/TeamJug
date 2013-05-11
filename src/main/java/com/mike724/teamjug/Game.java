@@ -1,13 +1,18 @@
 package com.mike724.teamjug;
 
 import com.mike724.networkapi.NetworkPlayer;
+import net.minecraft.server.v1_5_R3.EntityLiving;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.*;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -101,7 +106,7 @@ public class Game implements Runnable {
             this.endGame();
             return;
         } else if (timeOver) {
-            this.broadcast("Times up! Maybe next time...");
+            this.broadcast("Time is up! Maybe next time...");
             this.endGame();
             return;
         } else {
@@ -229,13 +234,51 @@ public class Game implements Runnable {
         chestplate.setItemMeta(lam);
         ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
         helmet.setItemMeta(lam);
-        inv.setBoots(boots);
-        inv.setLeggings(leggings);
-        inv.setChestplate(chestplate);
-        inv.setHelmet(helmet);
 
-        inv.setItem(0, new ItemStack(Material.WOOD_SWORD, 1));
-        inv.setItem(1, new ItemStack(Material.GRILLED_PORK, 3));
+        JPlayer jp = this.getPlayer(p.getName());
+        if(jp == null) {
+            return;
+        }
+        jp.setJuggernaut(true);
+        if(!jp.isJuggernaut()) {
+            inv.setBoots(boots);
+            inv.setLeggings(leggings);
+            inv.setChestplate(chestplate);
+            inv.setHelmet(helmet);
+            inv.setItem(0, new ItemStack(Material.WOOD_SWORD, 1));
+            inv.setItem(1, new ItemStack(Material.GRILLED_PORK, 3));
+        } else {
+            inv.setHelmet(helmet);
+            ItemStack chestplateD = new ItemStack(Material.DIAMOND_CHESTPLATE);
+            ItemStack leggingsD = new ItemStack(Material.DIAMOND_LEGGINGS);
+            ItemStack bootsD = new ItemStack(Material.DIAMOND_BOOTS);
+            inv.setChestplate(chestplateD);
+            inv.setLeggings(leggingsD);
+            inv.setBoots(bootsD);
+
+            //Reflection to set max health above 20
+            try {
+                for(Field aField : EntityLiving.class.getFields()) {
+                //    System.out.println("field: "+aField.getName());
+                }
+                Field f = EntityLiving.class.getDeclaredField("health");
+                f.setAccessible(true);
+                Field f1 = EntityLiving.class.getField("maxHealth");
+                try {
+                    f1.setInt(p, 200);
+                    f.setInt(p, 200);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+
+            this.broadcast("Health (loadout): "+p.getHealth());
+            this.broadcast("Health (loadout max): "+p.getMaxHealth());
+
+            inv.setItem(0, new ItemStack(Material.DIAMOND_SWORD, 1));
+        }
     }
 
     public void updateAllScoreboards(int secs) {

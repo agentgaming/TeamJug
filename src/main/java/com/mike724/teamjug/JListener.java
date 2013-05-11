@@ -158,6 +158,7 @@ public class JListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        tj.getGame().broadcast("Health: "+((Player) event.getEntity()).getHealth());
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -176,6 +177,8 @@ public class JListener implements Listener {
         if (tj.getGame().getTeam(noob) == tj.getGame().getTeam(dick)) {
             event.setCancelled(true);
         }
+
+        tj.getGame().broadcast("Health (hit): "+((Player) event.getEntity()).getHealth());
 
     }
 
