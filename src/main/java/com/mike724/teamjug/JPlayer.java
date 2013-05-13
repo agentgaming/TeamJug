@@ -54,6 +54,10 @@ public class JPlayer {
         return team;
     }
 
+    public Team getTeamObject() {
+        return TeamJug.getInstance().getGame().getTeamFromType(team);
+    }
+
     public void setTeam(TeamType team) {
         this.team = team;
     }

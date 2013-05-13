@@ -30,6 +30,8 @@ public class TeamJug extends JavaPlugin {
         this.spawnMap = new JMap("Spawn Lobby", "lobby", "Mike724", spawnLobbyLoc, spawnLobbyLoc);
         this.maps.add(new JMap("Rust", "rust", "CaptainP1ckle", new JLocation(0, 67, -2), new JLocation(32, 66, 15)));
         this.maps.add(new JMap("Dome", "dome", "CaptainP1ckle", new JLocation(-324, 16, -25), new JLocation(-265, 10, 75)));
+        this.maps.add(new JMap("Scrapyard", "scrapyard", "CaptainP1ckle", new JLocation(-14, 24, 186), new JLocation(-67, 23, 107)));
+        this.maps.add(new JMap("Underground", "underground", "CaptainP1ckle & hardc0reapplez", new JLocation(87, 4, 235), new JLocation(189, 2, 219)));
 
         this.state = GameState.LOBBY;
         this.game = new Game();

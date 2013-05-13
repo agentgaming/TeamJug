@@ -4,6 +4,7 @@ import com.mike724.networkapi.NetworkPlayer;
 import net.minecraft.server.v1_5_R3.EntityLiving;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -205,7 +206,11 @@ public class Game implements Runnable {
     }
 
     public TeamType getTeam(Player p) {
-        JPlayer jp = this.getPlayer(p.getName());
+        return this.getTeam(p.getName());
+    }
+
+    public TeamType getTeam(String p) {
+        JPlayer jp = this.getPlayer(p);
         if (jp == null) {
             return null;
         }
@@ -223,6 +228,9 @@ public class Game implements Runnable {
         p.setFoodLevel(20);
         p.setHealth(20);
         p.setGameMode(GameMode.ADVENTURE);
+        for(PotionEffect pe : p.getActivePotionEffects()) {
+            p.removePotionEffect(pe.getType());
+        }
         if (team == null) {
             return;
         }
@@ -241,7 +249,6 @@ public class Game implements Runnable {
         if(jp == null) {
             return;
         }
-        jp.setJuggernaut(true);
         if(!jp.isJuggernaut()) {
             inv.setBoots(boots);
             inv.setLeggings(leggings);
@@ -262,10 +269,9 @@ public class Game implements Runnable {
             p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, (int)Constants.GAME_TIME, 3));
             p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, (int) Constants.GAME_TIME, 1));
 
-            this.broadcast("Health (loadout): "+p.getHealth());
-            this.broadcast("Health (loadout max): "+p.getMaxHealth());
-
-            inv.setItem(0, new ItemStack(Material.WOOD_SWORD, 1));
+            ItemStack sword = new ItemStack(Material.WOOD_SWORD, 1);
+            sword.addEnchantment(Enchantment.KNOCKBACK, 1);
+            inv.setItem(0, sword);
 
             p.setFoodLevel(6);
         }
@@ -287,10 +293,14 @@ public class Game implements Runnable {
             objective.setDisplayName(timeLeft);
             if (gamePlaying) {
                 JPlayer jp = this.getPlayer(p.getName());
-                Score kills = objective.getScore(Bukkit.getOfflinePlayer(ChatColor.GREEN + "Kills: "));
+                Score kills = objective.getScore(Bukkit.getOfflinePlayer(ChatColor.GREEN + "My Kills: "));
                 kills.setScore(jp.getData().getKills());
-                Score deaths = objective.getScore(Bukkit.getOfflinePlayer(ChatColor.GREEN + "Deaths: "));
+                Score deaths = objective.getScore(Bukkit.getOfflinePlayer(ChatColor.GREEN + "My Deaths: "));
                 deaths.setScore(jp.getData().getDeaths());
+                Score jKillsR = objective.getScore(Bukkit.getOfflinePlayer(ChatColor.RED + "Jug. Kills R: "));
+                jKillsR.setScore(red.getJugKills());
+                Score jKillsB = objective.getScore(Bukkit.getOfflinePlayer(ChatColor.BLUE + "Jug. Kills B: "));
+                jKillsB.setScore(blue.getJugKills());
                 //   Score jugKills = objective.getScore(Bukkit.getOfflinePlayer(ChatColor.GREEN + "Jug Kills: "));
                 //   deaths.setScore(jp.getData().getDeaths());
             } else {
@@ -301,6 +311,16 @@ public class Game implements Runnable {
                 cash.setScore(np.getCash());
             }
             p.setScoreboard(board);
+        }
+    }
+
+    public Team getTeamFromType(TeamType tt) {
+        if(tt == TeamType.BLUE) {
+            return blue;
+        } else if(tt == TeamType.RED) {
+            return red;
+        } else {
+            return null;
         }
     }
 

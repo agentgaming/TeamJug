@@ -116,21 +116,44 @@ public class JListener implements Listener {
         event.getDrops().clear();
         event.setDroppedExp(0);
         Player killer = event.getEntity().getKiller();
+        final Player p = event.getEntity();
+        JPlayer jp = TeamJug.getInstance().getGame().getPlayer(p.getName());
+        boolean wasJug = jp.isJuggernaut();
+        jp.setJuggernaut(false);
+        final Game game = TeamJug.getInstance().getGame();
         if (killer != null) {
             event.setDeathMessage(event.getEntity().getName() + " was killed by " + killer.getName());
-            JPlayer jp = TeamJug.getInstance().getGame().getPlayer(killer.getName());
-            jp.getData().setKills(jp.getData().getKills() + 1);
+            JPlayer jp1 = TeamJug.getInstance().getGame().getPlayer(killer.getName());
+            if(wasJug) {
+                Team t = jp1.getTeamObject();
+                if(t != null) {
+                    t.setJugKills(t.getJugKills()+1);
+                }
+            }
+            jp1.getData().setKills(jp1.getData().getKills() + 1);
+
+            //juggernaut
+            Team t = null;
+            TeamType tt = jp1.getTeam();
+            if(tt == TeamType.RED) {
+                t = game.getRedTeam();
+            } else if(tt == TeamType.BLUE) {
+                t = game.getBlueTeam();
+            }
+            if(t != null) {
+                if(!t.isJuggernautSet()) {
+                    t.setNewJuggernaut();
+                    game.broadcast("debug: set new jug");
+                }
+            }
         } else {
             event.setDeathMessage(event.getEntity().getName() + " died");
         }
         final TeamJug tj = TeamJug.getInstance();
-        final Player p = event.getEntity();
-        final Game game = TeamJug.getInstance().getGame();
         final TeamType team = game.getTeam(p);
         if (team == null) {
             return;
         }
-        JPlayer jp = TeamJug.getInstance().getGame().getPlayer(p.getName());
         jp.getData().setDeaths(jp.getData().getDeaths() + 1);
         JMap curMap = game.getMap();
         World curWorld = curMap.getWorld();
@@ -172,7 +195,6 @@ public class JListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        tj.getGame().broadcast("Health: "+((Player) event.getEntity()).getHealth());
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -188,11 +210,15 @@ public class JListener implements Listener {
         Player noob = (Player) event.getEntity();
         Player dick = (Player) event.getDamager();
 
+        dick.getItemInHand().setDurability((short)0);
+
+        for(ItemStack is : noob.getInventory().getArmorContents()) {
+            is.setDurability((short)0);
+        }
+
         if (tj.getGame().getTeam(noob) == tj.getGame().getTeam(dick)) {
             event.setCancelled(true);
         }
-
-        tj.getGame().broadcast("Health (hit): "+((Player) event.getEntity()).getHealth());
 
     }
 

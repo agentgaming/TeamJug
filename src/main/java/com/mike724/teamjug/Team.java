@@ -8,6 +8,7 @@ import java.util.Random;
 public class Team {
 
     private HashMap<String, JPlayer> roster;
+    private boolean juggernautSet = false;
     private int jugKills;
 
     public Team(List<JPlayer> members) {
@@ -44,13 +45,22 @@ public class Team {
 
     public void setNewJuggernaut() {
         JPlayer cur = this.getJuggernaut();
-        cur.setJuggernaut(false);
-        cur.tell("You're no longer the juggernaut!");
+        if(cur != null) {
+            cur.setJuggernaut(false);
+            cur.tell("You're no longer the juggernaut!");
+        }
         Random rand = new Random();
         int num = rand.nextInt(roster.size());
         JPlayer newJug = (JPlayer) roster.values().toArray()[num];
         newJug.setJuggernaut(true);
+        TeamJug.getInstance().getGame().giveLoadout(newJug.getBukkitPlayer(), newJug.getTeam());
         newJug.tell("You're the new juggernaut!");
+        TeamJug.getInstance().getGame().broadcast(newJug.getName()+" is team "+newJug.getTeam().name()+"'s new juggernaut!");
+        this.juggernautSet = true;
+    }
+
+    public boolean isJuggernautSet() {
+        return juggernautSet;
     }
 
     public JPlayer getJuggernaut() {
