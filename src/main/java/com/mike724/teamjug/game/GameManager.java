@@ -1,5 +1,7 @@
-package com.mike724.teamjug;
+package com.mike724.teamjug.game;
 
+import com.mike724.teamjug.TeamJug;
+import com.mike724.teamjug.game.Game;
 import com.mike724.teamjug.teams.TeamManager;
 
 @SuppressWarnings("unused")
@@ -19,9 +21,8 @@ public class GameManager {
         game = new Game(tm);
     }
 
-    public void endGame() {
-        game.end();
-        game = null;
+    public Game getGame() {
+        return game;
     }
 
     public void onTick(long ticks) {
