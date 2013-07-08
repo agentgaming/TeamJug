@@ -28,6 +28,13 @@ public class TimeManager {
         timers.put(timer, time);
     }
 
+    public long getTimeLeft(Timer t) {
+        if(timers.containsKey(t)) {
+            return timers.get(t);
+        }
+        return -1;
+    }
+
     public void onTick(long ticks) {
         //Every second
         if(ticks % 20 == 0) {

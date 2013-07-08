@@ -14,8 +14,8 @@ public class TeamManager {
     private Team blueTeam;
 
     public TeamManager() {
-        redTeam = new Team();
-        blueTeam = new Team();
+        redTeam = new Team(TeamType.RED);
+        blueTeam = new Team(TeamType.BLUE);
     }
 
     public void emptyTeams() {
@@ -39,8 +39,9 @@ public class TeamManager {
         for(int i=0;i<2;i++) {
             List<Player> players = (i==0) ? redPlayers : bluePlayers;
             String[] names = new String[players.size()];
+            int c = 0;
             for(Player p : players) {
-                names[names.length] = p.getName();
+                names[c++] = p.getName();
             }
             for(Object obj : ds.getObjects(Arrays.asList(names), TStats.class)) {
                 if(obj != null && obj instanceof TStats) {
@@ -67,6 +68,17 @@ public class TeamManager {
         }
     }
 
+    public TeamType addPlayerToAnyTeam(Player p) {
+        Team team = (redTeam.getPlayers().size() < blueTeam.getPlayers().size()) ? redTeam : blueTeam;
+        Object obj = TeamJug.getInstance().getDataStorage().getObject(TStats.class, p.getName());
+        if(obj == null) {
+            obj = new TStats(p.getName());
+        }
+        TStats stats = (TStats)obj;
+        team.getRosterRaw().put(p, stats);
+        return team.getType();
+    }
+
     public Team getRedTeam() {
         return redTeam;
     }
@@ -76,8 +88,10 @@ public class TeamManager {
     }
 
     public Set<Player> getAllPlayers() {
-        Set<Player> players = redTeam.getRosterRaw().keySet();
-        players.addAll(blueTeam.getRosterRaw().keySet());
-        return players;
+        Set<Player> players1 = redTeam.getRosterRaw().keySet();
+        Set<Player> players2 = blueTeam.getRosterRaw().keySet();
+        Set<Player> all = new HashSet<>(players1);
+        all.addAll(players2);
+        return all;
     }
 }

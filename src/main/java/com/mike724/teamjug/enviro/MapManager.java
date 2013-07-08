@@ -16,14 +16,18 @@ public class MapManager {
     private List<GameMap> maps;
     private GameMap loadedMap;
     private World loadedWorld;
+    private World lobbyWorld;
 
     public MapManager() {
         this.maps = new ArrayList<>();
         this.loadedMap = null;
         this.loadedWorld = null;
+        this.lobbyWorld = Bukkit.getWorld("lobby");
     }
 
     public void loadMap(GameMap map) {
+        this.unloadCurrent();
+
         World w = Bukkit.getServer().createWorld(new WorldCreator(map.getRawName()));
         w.setDifficulty(Difficulty.NORMAL);
         w.setPVP(true);
@@ -36,8 +40,6 @@ public class MapManager {
         w.setAutoSave(false);
         w.setKeepSpawnInMemory(false);
 
-        this.unloadCurrent();
-
         this.loadedMap = map;
         this.loadedWorld = w;
 
@@ -49,6 +51,14 @@ public class MapManager {
             Bukkit.getServer().unloadWorld(loadedMap.getRawName(), false);
             TeamJug.getInstance().getLogger().info("Map " + loadedMap.getRawName() + " unloaded!");
         }
+    }
+
+    public World getCurrentWorld() {
+        return loadedWorld;
+    }
+
+    public World getLobbyWorld() {
+        return lobbyWorld;
     }
 
     public void addDefaultMaps() {

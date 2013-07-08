@@ -1,10 +1,11 @@
 package com.mike724.teamjug.game;
 
 import com.mike724.teamjug.TeamJug;
-import com.mike724.teamjug.game.Game;
+import com.mike724.teamjug.enviro.GameMap;
 import com.mike724.teamjug.lobby.Lobby;
 import com.mike724.teamjug.teams.TeamManager;
 import com.mike724.teamjug.timing.State;
+import org.bukkit.ChatColor;
 
 @SuppressWarnings("unused")
 public class GameManager {
@@ -18,17 +19,23 @@ public class GameManager {
         lobby = null;
     }
 
-    /** Called when the plugin is fully loaded and ready for the game */
+    /**
+     * Called when the plugin is fully loaded and ready for the game
+     */
     public void kickStart() {
-
+        startLobby();
     }
 
-    public void newGame() {
-        TeamManager tm = new TeamManager();
-        //Setup teams, this will also each player's stats
-        tm.setupTeams(TeamJug.getInstance().getServer().getOnlinePlayers());
-        //Initialize the game object, give it the TeamManager
-        game = new Game(tm);
+    public void startLobby() {
+        lobby = new Lobby();
+        game = null;
+        gameState = State.LOBBY;
+    }
+
+    public void startNewGame(TeamManager tm, GameMap map) {
+        game = new Game(tm, map);
+        lobby = null;
+        gameState = State.GAME;
     }
 
     public State getGameState() {
@@ -44,8 +51,12 @@ public class GameManager {
     }
 
     public void onTick(long ticks) {
-        if(game != null) {
+        if (game != null) {
             game.onTick(ticks);
         }
+    }
+
+    public void broadcast(String msg) {
+        TeamJug.getInstance().getServer().broadcastMessage(ChatColor.DARK_RED + "[TeamJug] " + ChatColor.WHITE + msg);
     }
 }
