@@ -6,11 +6,13 @@ import com.mike724.teamjug.teams.TeamManager;
 import com.mike724.teamjug.teams.TeamType;
 import com.mike724.teamjug.timing.TimeConstants;
 import com.mike724.teamjug.timing.Timer;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import com.mike724.teamjug.util.PlayerUtil;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.Set;
 
@@ -25,10 +27,11 @@ public class Game {
     private GameListener listener;
 
     public Game(TeamManager tm, GameMap map) {
+
         this.tm = tm;
         //Register timer for game end
         TeamJug tj = TeamJug.getInstance();
-        this.endGameTimer = new Timer(TimeConstants.GAME_MAX_TIME, false, this, "endTimeOver");
+        this.endGameTimer = new Timer(TimeConstants.GAME_MAX_TIME, false, this, "_endTimeOver");
         tj.getTimeManager().addTimer(endGameTimer);
         this.broadcast("Game session started on map " + map.getDisplayName());
 
@@ -42,14 +45,16 @@ public class Game {
         }
 
         for (Player p : tm.getRedTeam().getPlayers()) {
+            p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You are on the red team.");
             handlePlayer(p, TeamType.RED);
         }
         for (Player p : tm.getBlueTeam().getPlayers()) {
+            p.sendMessage(ChatColor.BLUE + "" + ChatColor.ITALIC + "You are on the blue team.");
             handlePlayer(p, TeamType.BLUE);
         }
 
         //Register listener
-        listener = new GameListener();
+        listener = new GameListener(this);
         tj.getServer().getPluginManager().registerEvents(listener, tj);
     }
 
@@ -61,19 +66,36 @@ public class Game {
     }
 
     public void handlePlayer(Player p, TeamType tt) {
+        PlayerUtil.clearPlayerCompletely(p);
+        p.setGameMode(GameMode.ADVENTURE);
         switch (tt) {
             case RED:
-                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You are on the red team.");
                 p.teleport(redSpawn);
                 break;
             case BLUE:
-                p.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + "You are on the blue team.");
                 p.teleport(blueSpawn);
                 break;
             default:
                 break;
         }
-        //TODO: Give player weapons!
+        //TEMPORARY!!!!! WILL
+        LeatherArmorMeta lam = (LeatherArmorMeta) (new ItemStack(Material.LEATHER_BOOTS)).getItemMeta();
+        lam.setColor(tt == TeamType.RED ? Color.RED : Color.BLUE);
+        ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
+        boots.setItemMeta(lam);
+        ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
+        leggings.setItemMeta(lam);
+        ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE);
+        chestplate.setItemMeta(lam);
+        ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
+        helmet.setItemMeta(lam);
+        PlayerInventory inv = p.getInventory();
+        inv.setBoots(boots);
+        inv.setLeggings(leggings);
+        inv.setChestplate(chestplate);
+        inv.setHelmet(helmet);
+        inv.setItem(0, new ItemStack(Material.WOOD_SWORD, 1));
+        inv.setItem(1, new ItemStack(Material.GRILLED_PORK, 3));
     }
 
     public void onTick(long ticks) {
@@ -86,13 +108,10 @@ public class Game {
         float percent = (float) ((double) timeLeft / (double) totalTime);
         for (Player p : all) {
             p.setExp(percent);
-            // p.sendMessage("percent: "+percent);
-            //p.sendMessage("timeLeft: "+timeLeft);
-            //p.sendMessage("totalTime: "+totalTime);
         }
     }
 
-    public void endTimeOver() {
+    public void _endTimeOver() {
         this.end(GameEndReason.TIME_OVER);
     }
 
@@ -105,7 +124,7 @@ public class Game {
         String bcast = "";
         switch (reason) {
             case TIME_OVER:
-                bcast = "Time has ran out!";
+                bcast = "Time has run out!";
                 break;
             case RED_WIN:
                 bcast = "The " + ChatColor.RED + "RED" + ChatColor.WHITE + " team has won!";
@@ -122,6 +141,15 @@ public class Game {
 
         HandlerList.unregisterAll(listener);
         TeamJug.getInstance().getGameManager().startLobby();
+    }
+
+    public TeamType getPlayerTeamType(Player p) {
+        if(this.tm.getRedTeam().getRosterRaw().containsKey(p)) {
+            return TeamType.RED;
+        } else if(this.tm.getBlueTeam().getRosterRaw().containsKey(p)) {
+            return TeamType.BLUE;
+        }
+        return null;
     }
 
     public void broadcast(String msg) {

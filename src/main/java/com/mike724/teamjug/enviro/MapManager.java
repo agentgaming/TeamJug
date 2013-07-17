@@ -69,10 +69,14 @@ public class MapManager {
         maps.add(m1);
 
         //Another map
+        TLocation[] m2rs = {new TLocation(0, 67, -2)};
+        TLocation[] m2bs = {new TLocation(32, 66, 15)};
+        GameMap m2 = new GameMap("Rust", "rust", strTok("CaptainP1ckle"), m2rs, m2bs);
+        maps.add(m2);
     }
 
     public List<GameMap> getMaps() {
-        return Collections.unmodifiableList(maps);
+        return maps;
     }
 
     public String[] strTok(String data) {

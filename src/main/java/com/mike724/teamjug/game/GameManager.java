@@ -53,6 +53,8 @@ public class GameManager {
     public void onTick(long ticks) {
         if (game != null) {
             game.onTick(ticks);
+        } else if(lobby != null) {
+            lobby.onTick(ticks);
         }
     }
 
