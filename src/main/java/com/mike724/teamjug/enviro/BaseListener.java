@@ -1,5 +1,7 @@
 package com.mike724.teamjug.enviro;
 
+import com.mike724.teamjug.TeamJug;
+import com.mike724.teamjug.player.MetadataManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,9 +15,26 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 @SuppressWarnings("unused")
 public class BaseListener implements Listener {
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerQuitMonitor(PlayerQuitEvent event) {
+        //TODO: Replace default quit msg with another
+        MetadataManager mdMan = TeamJug.getInstance().getMetadataManager();
+        String pName = event.getPlayer().getName();
+        mdMan.savePlayerMetadata(pName);
+        mdMan.removePlayerFromCache(pName);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerJoinMonitor(PlayerJoinEvent event) {
+        //TODO: Replace default join msg with another
+        TeamJug.getInstance().getMetadataManager().addPlayerToCache(event.getPlayer().getName());
+    }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onBlockBreak(BlockBreakEvent event) {

@@ -47,7 +47,7 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
-                                    <include>com.mike724:networkapi</include>
+                                    <include>com.mike724:motoloader</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
@@ -73,7 +73,7 @@
         </dependency>
         <dependency>
             <groupId>com.mike724</groupId>
-            <artifactId>networkapi</artifactId>
+            <artifactId>motoloader</artifactId>
             <version>0.1</version>
             <type>jar</type>
             <scope>compile</scope>

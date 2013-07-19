@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
+import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -100,7 +101,7 @@ public class Game {
 
     public void onTick(long ticks) {
         TeamJug tj = TeamJug.getInstance();
-        Set<Player> all = tm.getAllPlayers();
+        List<Player> all = tm.getAllPlayers();
 
         //Time bar
         long timeLeft = tj.getTimeManager().getTimeLeft(endGameTimer);
@@ -144,9 +145,9 @@ public class Game {
     }
 
     public TeamType getPlayerTeamType(Player p) {
-        if(this.tm.getRedTeam().getRosterRaw().containsKey(p)) {
+        if(this.tm.getRedTeam().getPlayers().contains(p)) {
             return TeamType.RED;
-        } else if(this.tm.getBlueTeam().getRosterRaw().containsKey(p)) {
+        } else if(this.tm.getBlueTeam().getPlayers().contains(p)) {
             return TeamType.BLUE;
         }
         return null;

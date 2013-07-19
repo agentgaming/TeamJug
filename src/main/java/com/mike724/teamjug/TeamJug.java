@@ -4,6 +4,8 @@ import com.mike724.networkapi.DataStorage;
 import com.mike724.teamjug.enviro.EnviroMaintainer;
 import com.mike724.teamjug.enviro.MapManager;
 import com.mike724.teamjug.game.GameManager;
+import com.mike724.teamjug.player.Metadata;
+import com.mike724.teamjug.player.MetadataManager;
 import com.mike724.teamjug.timing.TimeManager;
 import com.mike724.teamjug.timing.Timer;
 import org.bukkit.Bukkit;
@@ -21,6 +23,7 @@ public class TeamJug extends JavaPlugin {
     private DataStorage dataStorage;
     private GameManager gameManager;
     private MapManager mapManager;
+    private MetadataManager metadataManager;
 
     /* Startup/shutdown logic */
 
@@ -29,10 +32,16 @@ public class TeamJug extends JavaPlugin {
         instance = this;
         timeManager = new TimeManager();
         enviroMaintainer = new EnviroMaintainer();
-        dataStorage = new DataStorage("auth", "OBjwrGyI1Pdj3Dzi", "password");
+        try {
+            dataStorage = new DataStorage("jxBkqvpe0seZhgfavRqB", "RXaCcuuQcIUFZuVZik9K", "nXWvOgfgRJKBbbzowle1");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         gameManager = new GameManager();
         mapManager = new MapManager();
         mapManager.addDefaultMaps();
+        metadataManager = new MetadataManager();
+
         //this.getTimeManager().addTimer(new Timer(5, true, "testMethod"));
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TickRunner(), 0l, 1l);
 
@@ -73,6 +82,10 @@ public class TeamJug extends JavaPlugin {
 
     public MapManager getMapManager() {
         return mapManager;
+    }
+
+    public MetadataManager getMetadataManager() {
+        return metadataManager;
     }
 
     /* Debug messages */
