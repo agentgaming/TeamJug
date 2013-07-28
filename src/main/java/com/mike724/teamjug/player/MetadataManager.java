@@ -24,6 +24,10 @@ public class MetadataManager {
         }
     }
 
+    public void clearAllCache() {
+        cache.clear();
+    }
+
     public void savePlayerMetadata(String pName) {
         if(cache.containsKey(pName)) {
             TeamJug.getInstance().getDataStorage().writeObjects(cache.get(pName).getSaveMap());
@@ -35,6 +39,9 @@ public class MetadataManager {
         for(Metadata md : cache.values()) {
             upload.putAll(md.getSaveMap());
         }
+        if(upload.isEmpty()) {
+            return;
+        }
         TeamJug.getInstance().getDataStorage().writeObjects(upload);
     }
 
@@ -42,7 +49,6 @@ public class MetadataManager {
         if(cache.containsKey(pName)) {
             return cache.get(pName);
         } else {
-            TeamJug.errorMessage("getPlayerMetadata should never be null. It was null. WTH.");
             return null;
         }
     }

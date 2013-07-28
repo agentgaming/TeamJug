@@ -15,7 +15,8 @@ import java.util.HashMap;
 @SuppressWarnings("unused")
 public class Metadata {
 
-    String playerName;
+    private String playerName;
+    private KitType kitType;
     private NetworkPlayer networkPlayer;
     private NetworkRank networkRank;
     private TStats stats;
@@ -71,5 +72,13 @@ public class Metadata {
 
     public TStats getStats() {
         return stats;
+    }
+
+    public KitType getKitType() {
+        return kitType;
+    }
+
+    public void setKitType(KitType kitType) {
+        this.kitType = kitType;
     }
 }

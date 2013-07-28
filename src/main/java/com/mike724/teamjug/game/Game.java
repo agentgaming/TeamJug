@@ -8,6 +8,7 @@ import com.mike724.teamjug.timing.TimeConstants;
 import com.mike724.teamjug.timing.Timer;
 import com.mike724.teamjug.util.PlayerUtil;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
@@ -96,7 +97,15 @@ public class Game {
         inv.setChestplate(chestplate);
         inv.setHelmet(helmet);
         inv.setItem(0, new ItemStack(Material.WOOD_SWORD, 1));
-        inv.setItem(1, new ItemStack(Material.GRILLED_PORK, 3));
+
+        ItemStack infinityBow = new ItemStack(Material.BOW, 1);
+        infinityBow.addEnchantment(Enchantment.ARROW_INFINITE, 1);
+
+        inv.setItem(1, infinityBow);
+
+        inv.setItem(2, new ItemStack(Material.ARROW, 1));
+
+        inv.setItem(3, new ItemStack(Material.GRILLED_PORK, 3));
     }
 
     public void onTick(long ticks) {

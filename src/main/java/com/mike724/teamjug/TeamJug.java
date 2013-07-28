@@ -55,7 +55,8 @@ public class TeamJug extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        metadataManager.saveAllMetadata();
+        metadataManager.clearAllCache();
     }
 
     /* Getters and setters */

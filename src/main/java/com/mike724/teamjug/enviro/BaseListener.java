@@ -26,8 +26,10 @@ public class BaseListener implements Listener {
         //TODO: Replace default quit msg with another
         MetadataManager mdMan = TeamJug.getInstance().getMetadataManager();
         String pName = event.getPlayer().getName();
-        mdMan.savePlayerMetadata(pName);
-        mdMan.removePlayerFromCache(pName);
+        if(mdMan.getPlayerMetadata(pName) != null) {
+            mdMan.savePlayerMetadata(pName);
+            mdMan.removePlayerFromCache(pName);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

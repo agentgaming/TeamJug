@@ -85,10 +85,10 @@ public class VoteManager {
         if(maps.containsKey(mapID)) {
             int numVotes = votes.get(mapID);
             votes.put(mapID, numVotes + v.getWeight());
+            voted.add(p.getName());
             p.sendMessage(ChatColor.GREEN+"Vote for map "+ChatColor.YELLOW+maps.get(mapID).getDisplayName()+ChatColor.GREEN+" added");
             updateVoteBoard();
         }
-        voted.add(p.getName());
     }
 
     public void updateVoteBoard() {

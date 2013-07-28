@@ -2,13 +2,19 @@ package com.mike724.teamjug.game;
 
 import com.mike724.teamjug.TeamJug;
 import com.mike724.teamjug.enviro.BaseListener;
+import com.mike724.teamjug.player.MetadataManager;
+import com.mike724.teamjug.stats.TStats;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -25,13 +31,60 @@ public class GameListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDeath(PlayerDeathEvent event) {
-        final Location deathLoc = event.getEntity().getEyeLocation();
-        final Player p = event.getEntity();
-        p.setHealth(20);
+        //Remove drops and crap
         event.getDrops().clear();
         event.setDroppedExp(0);
-        event.setDeathMessage("");
-        Bukkit.broadcastMessage(ChatColor.ITALIC + "Player " + p.getName() + " died");
+
+        //"cancel" the event
+        event.getEntity().setHealth(20);
+        event.getEntity().setFallDistance(0);
+
+        Player p = event.getEntity();
+        final Location deathLoc = p.getEyeLocation();
+
+        EntityDamageEvent ede = event.getEntity().getLastDamageCause();
+        if(!(ede instanceof EntityDamageByEntityEvent)) {
+            event.setDeathMessage(ChatColor.ITALIC + "Player " + p.getName() + " died");
+            this.handleDeath(p, deathLoc);
+            return;
+        }
+
+        EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent)ede;
+        Entity damager = edbee.getDamager();
+        Player killer = null;
+        if(damager instanceof Player) {
+            killer = (Player)damager;
+        } else if(damager instanceof Arrow) {
+            killer = (Player)((Arrow) damager).getShooter();
+        } else {
+            //Not sure how to handle yet, output debug
+            event.setDeathMessage("Player "+p.getName()+" killed by "+damager.getClass().getName());
+            this.handleDeath(p, deathLoc);
+            return;
+        }
+
+        //Suicide? Idk how this would happen. Shooting arrows in the sky?
+        if(p == killer) {
+            event.setDeathMessage(ChatColor.ITALIC+"Player "+p.getName()+" committed suicide");
+            this.handleDeath(p, deathLoc);
+            return;
+        }
+
+        //Add a kill
+        TStats killerStats = TeamJug.getInstance().getMetadataManager().getPlayerMetadata(killer.getName()).getStats();
+        killerStats.setKills(killerStats.getKills()+1);
+
+        event.setDeathMessage(ChatColor.ITALIC+"Player " + p.getName() + " was killed by "+killer.getName());
+
+        this.handleDeath(p, deathLoc);
+        return;
+    }
+
+
+    //Particles, re-spawns player, adds death to count
+    private void handleDeath(final Player p, final Location deathLoc) {
+        TStats stats = TeamJug.getInstance().getMetadataManager().getPlayerMetadata(p.getName()).getStats();
+        stats.setDeaths(stats.getDeaths()+1);
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(TeamJug.getInstance(), new Runnable() {
             @Override
             public void run() {
@@ -45,6 +98,25 @@ public class GameListener extends BaseListener {
                 game.handlePlayer(p, game.getPlayerTeamType(p));
             }
         });
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerDamage(EntityDamageEvent event) {
+        if(event instanceof EntityDamageByEntityEvent) {
+            EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent)event;
+            if(edbee.getEntity() instanceof Player) {
+                Player p = (Player)edbee.getEntity();
+                Entity damager = edbee.getDamager();
+                if(damager instanceof Player) {
+                    Player killer = (Player)damager;
+                    if(game.getPlayerTeamType(p) == game.getPlayerTeamType(killer)) {
+                        TeamJug.errorMessage("Damage cancelled");
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
