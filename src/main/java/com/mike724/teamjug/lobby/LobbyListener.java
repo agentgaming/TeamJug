@@ -26,7 +26,7 @@ public class LobbyListener extends BaseListener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onInventoryClick(InventoryClickEvent event) {
         if(lobby.getVoteManager().isVotingInventory(event.getInventory())) {
-            int mapID = event.getSlot();
+            int mapID = event.getRawSlot();
             int weight = 1;
             lobby.getVoteManager().submitVote((Player)event.getWhoClicked(), new Vote(mapID, weight));
         }
