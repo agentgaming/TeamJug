@@ -2,13 +2,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mike724.teamjug</groupId>
     <artifactId>TeamJug</artifactId>
-    <version>0.1</version>
+    <version>${env.BUILD_NUMBER}</version>
     <name>TeamJug</name>
     <url>http://www.mike724.com/</url>
     <repositories>
         <repository>
             <id>bukkit-repo</id>
             <url>http://repo.bukkit.org/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>AGNRepo</id>
+            <url>https://mike724.com/repo/content/repositories/agentgaming-release/</url>
         </repository>
     </repositories>
     <build>
@@ -34,26 +38,6 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.mike724:motoloader</include>
-                                </includes>
-                            </artifactSet>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -65,16 +49,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>LATEST</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.mike724</groupId>
-            <artifactId>motoloader</artifactId>
-            <version>0.1</version>
+            <groupId>com.mike724.motoapi</groupId>
+            <artifactId>MotoAPI</artifactId>
+            <version>(1.0,]</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
