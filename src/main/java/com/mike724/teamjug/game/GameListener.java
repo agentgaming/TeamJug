@@ -2,8 +2,7 @@ package com.mike724.teamjug.game;
 
 import com.mike724.teamjug.TeamJug;
 import com.mike724.teamjug.enviro.BaseListener;
-import com.mike724.teamjug.player.MetadataManager;
-import com.mike724.teamjug.stats.TStats;
+import com.mike724.teamjug.stats.StatsController;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
@@ -51,7 +50,7 @@ public class GameListener extends BaseListener {
 
         EntityDamageByEntityEvent edbee = (EntityDamageByEntityEvent)ede;
         Entity damager = edbee.getDamager();
-        Player killer = null;
+        Player killer;
         if(damager instanceof Player) {
             killer = (Player)damager;
         } else if(damager instanceof Arrow) {
@@ -71,20 +70,17 @@ public class GameListener extends BaseListener {
         }
 
         //Add a kill
-        TStats killerStats = TeamJug.getInstance().getMetadataManager().getPlayerMetadata(killer.getName()).getStats();
-        killerStats.setKills(killerStats.getKills()+1);
+        StatsController.addKills(killer.getName(), 1);
 
         event.setDeathMessage(ChatColor.ITALIC+"Player " + p.getName() + " was killed by "+killer.getName());
 
         this.handleDeath(p, deathLoc);
-        return;
     }
 
 
     //Particles, re-spawns player, adds death to count
     private void handleDeath(final Player p, final Location deathLoc) {
-        TStats stats = TeamJug.getInstance().getMetadataManager().getPlayerMetadata(p.getName()).getStats();
-        stats.setDeaths(stats.getDeaths()+1);
+        StatsController.addDeaths(p.getName(), 1);
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(TeamJug.getInstance(), new Runnable() {
             @Override
             public void run() {
@@ -112,7 +108,6 @@ public class GameListener extends BaseListener {
                     if(game.getPlayerTeamType(p) == game.getPlayerTeamType(killer)) {
                         TeamJug.errorMessage("Damage cancelled");
                         event.setCancelled(true);
-                        return;
                     }
                 }
             }
