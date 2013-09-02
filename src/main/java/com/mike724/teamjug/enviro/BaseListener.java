@@ -1,5 +1,9 @@
 package com.mike724.teamjug.enviro;
 
+import com.mike724.motoapi.push.MotoPushReconnect;
+import com.mike724.motoapi.push.ServerState;
+import com.mike724.motoapi.push.ServerType;
+import com.mike724.motoserver.MotoServer;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +22,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 @SuppressWarnings("unused")
 public class BaseListener implements Listener {
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onMotoPushReconnect(MotoPushReconnect e) {
+        //Register the server with MotoPush
+        MotoServer.getInstance().getMotoPush().setIdentity(ServerType.TEAMJUG, ServerState.OPEN);
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuitMonitor(PlayerQuitEvent event) {

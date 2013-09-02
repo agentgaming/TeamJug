@@ -1,5 +1,7 @@
 package com.mike724.teamjug;
 
+import com.mike724.motoapi.push.ServerState;
+import com.mike724.motoapi.push.ServerType;
 import com.mike724.motoapi.storage.Storage;
 import com.mike724.motoserver.MotoServer;
 import com.mike724.teamjug.enviro.EnviroMaintainer;
@@ -34,6 +36,9 @@ public class TeamJug extends JavaPlugin {
         //Listeners
         PluginManager pm = this.getServer().getPluginManager();
         pm.registerEvents(enviroMaintainer, this);
+
+        //Register for matchmaking
+        MotoServer.getInstance().getMotoPush().setIdentity(ServerType.TEAMJUG, ServerState.OPEN);
 
         //START IT UP
         gameManager.kickStart();
